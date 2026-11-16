@@ -37,17 +37,17 @@ Setiap usaha tampil seperti toko sungguhan: **logo, warna, huruf, tema terang/ge
 
 | Usaha | Profil | Tampilan | Yang bisa dicoba |
 |---|---|---|---|
-| Kedai Teh Rasa | `kedai-teh-rasa` | oranye bata, Plus Jakarta Sans, bulat | ukuran, gula, es, topping (harga ikut berubah); waktu ambil hari ini; topping yang habis |
-| Rupa Wear | `rupa-wear` | hitam, Fraunces (serif), tajam | warna & ukuran; gambar berganti sesuai warna; kombinasi habis → ukuran disesuaikan otomatis |
-| Garis Barbershop | `garis-barbershop` | emas di atas gelap, Space Grotesk | booking tanggal + jam, pilih kapster, home service (+biaya) |
-| Kilap Auto Detailing | `kilap-auto` | hijau toska, Space Grotesk | harga per jenis mobil, booking, home service |
+| Kedai Teh Rasa | `kedai-teh-rasa` | tata *kafe*: gelas melayang di atas tatakan berputar, produk di piring bulat, harga seperti stiker | ukuran, gula, es, topping (harga ikut berubah); waktu ambil hari ini; topping yang habis |
+| Rupa Wear | `rupa-wear` | tata *lookbook*: kaos berayun di hanger, huruf serif, gambar tinggi, produk pertama besar | warna & ukuran; gambar berganti sesuai warna; kombinasi habis → ukuran disesuaikan otomatis |
+| Garis Barbershop | `garis-barbershop` | tata *daftar*: tiang barbershop berputar, daftar harga seperti papan dinding, tema gelap | booking tanggal + jam, pilih kapster, home service (+biaya) |
+| Kilap Auto Detailing | `kilap-auto` | tata *garasi*: mobil di meja putar dengan lantai grid, kartu mendatar dengan kilap logam | harga per jenis mobil, booking, home service |
 
 Detail kecil: gambar produk 3D yang bisa diputar, kartu miring mengikuti mouse, gambar terbang ke keranjang, urungkan hapus, keranjang per usaha tersimpan saat halaman dimuat ulang. Efek 3D memakai CSS (tanpa library) dan otomatis mati bila perangkat diatur "kurangi gerakan".
 
 ## Membuat katalog untuk klien
 
 ```
-src/merek/profil/<id>.json   tampilan: nama, logo, 2 warna, huruf, tema, sudut, slogan, alamat, "data"
+src/merek/profil/<id>.json   tampilan: nama, logo, 2 warna, huruf, tema, sudut, tata, hero 3D, slogan, alamat, "data"
 src/data/katalog/<data>.js   isi: produk, harga, opsi, gambar, aturan antar/booking
 public/merek/<id>.svg        logo & favicon
 public/produk/<data>/*.svg   gambar produk (ganti dengan foto asli: .jpg/.png/.webp)

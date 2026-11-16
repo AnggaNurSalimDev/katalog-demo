@@ -27,6 +27,22 @@ export const SUDUT = {
   bulat: { kecil: '12px', besar: '22px' },
 };
 
+// Tata letak katalog (CSS di gaya.css, [data-tata]) dan benda 3D di kepala toko (komponen Hero3D).
+// Markup sama untuk semua; yang berubah hanya susunan dan gaya.
+export const TATA = {
+  kafe: 'kartu dengan piring bulat, harga seperti stiker',
+  lookbook: 'katalog busana: gambar tinggi, produk pertama besar',
+  daftar: 'daftar harga seperti papan di dinding',
+  garasi: 'kartu mendatar dengan kilap logam',
+};
+export const BENTUK_HERO = {
+  melayang: 'gambar melayang di atas tatakan yang berputar',
+  gantung: 'gambar tergantung di hanger, berayun',
+  tiang: 'tiang barbershop berputar (tanpa gambar)',
+  putar: 'gambar di atas meja putar dengan pantulan',
+};
+const HERO_BUTUH_GAMBAR = new Set(['melayang', 'gantung', 'putar']);
+
 // Warna netral & status. Status (galat) sengaja tidak ikut warna merek.
 const TEMA = {
   terang: {
@@ -58,14 +74,15 @@ export const PROFIL_BAWAAN = Object.freeze({
   favicon: '/favicon.svg',
   warna: Object.freeze({ utama: '#334155', aksen: '#e2e8f0' }),
   huruf: 'jakarta',
-  gaya: Object.freeze({ tema: 'terang', sudut: 'sedang' }),
+  gaya: Object.freeze({ tema: 'terang', sudut: 'sedang', tata: 'kafe' }),
+  hero: Object.freeze({ bentuk: 'tiang', gambar: null }),
   teks: Object.freeze({ jenis: 'Toko', slogan: 'Pesan lebih gampang, langsung masuk WhatsApp.', alamat: null }),
   data: JENIS_DATA[0],
   fiktif: false,
 });
 
 const POLA_ID = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-const KUNCI = ['id', 'nama', 'logo', 'favicon', 'warna', 'huruf', 'gaya', 'teks', 'data', 'fiktif'];
+const KUNCI = ['id', 'nama', 'logo', 'favicon', 'warna', 'huruf', 'gaya', 'hero', 'teks', 'data', 'fiktif'];
 
 const objekBiasa = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
 const teksPendek = (x, maks) => typeof x === 'string' && x.trim().length > 0 && x.length <= maks;
@@ -129,8 +146,22 @@ export function validasiProfil(mentah) {
     gaya: validasiBagian(
       mentah.gaya,
       B.gaya,
-      { tema: [(x) => x in TEMA, 'terang | gelap'], sudut: [(x) => x in SUDUT, 'tajam | sedang | bulat'] },
+      {
+        tema: [(x) => x in TEMA, 'terang | gelap'],
+        sudut: [(x) => x in SUDUT, 'tajam | sedang | bulat'],
+        tata: [(x) => x in TATA, Object.keys(TATA).join(' | ')],
+      },
       'gaya.',
+      masalah,
+    ),
+    hero: validasiBagian(
+      mentah.hero,
+      B.hero,
+      {
+        bentuk: [(x) => x in BENTUK_HERO, Object.keys(BENTUK_HERO).join(' | ')],
+        gambar: [(x) => x === null || pathPublik(x), 'null atau path di folder public'],
+      },
+      'hero.',
       masalah,
     ),
     teks: validasiBagian(
@@ -145,6 +176,11 @@ export function validasiProfil(mentah) {
       masalah,
     ),
   };
+
+  if (HERO_BUTUH_GAMBAR.has(profil.hero.bentuk) && !profil.hero.gambar) {
+    masalah.push(`hero.gambar: wajib untuk bentuk "${profil.hero.bentuk}"; diganti "tiang"`);
+    profil.hero = { bentuk: 'tiang', gambar: null };
+  }
 
   // Invariant keterbacaan: tulisan di atas warna utama (kepala, tombol) minimal 4.5:1.
   if (kontras(tintaDiAtas(profil.warna.utama), profil.warna.utama) < 4.5) {

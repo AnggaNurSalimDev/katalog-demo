@@ -58,7 +58,7 @@ export default function App() {
           <span className="merek">{profil.logo.teks}</span>
         </div>
       </header>
-      <main className="isi">
+      <main className="isi" data-tata={profil.gaya.tata}>
         <Toko key={toko.id} profil={profil} toko={toko} isi={data.keranjang[toko.id] ?? []} form={data.formulir[toko.id]} ubahIsi={ubahIsi} ubahForm={ubahForm} />
         <PengalihProfil profil={profil} onGanti={ganti} />
         <p className="halus">{profil.fiktif ? 'Usaha, produk, dan harga di demo ini fiktif. Pesanan diteruskan ke nomor WA demo.' : ''}</p>

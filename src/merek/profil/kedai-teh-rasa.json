@@ -3,11 +3,25 @@
   "nama": "Kedai Teh Rasa",
   "fiktif": true,
   "data": "teh",
-  "logo": { "teks": "Kedai Teh Rasa", "gambar": "/merek/kedai-teh-rasa.svg" },
+  "logo": {
+    "teks": "Kedai Teh Rasa",
+    "gambar": "/merek/kedai-teh-rasa.svg"
+  },
   "favicon": "/merek/kedai-teh-rasa.svg",
-  "warna": { "utama": "#9a3412", "aksen": "#fed7aa" },
+  "warna": {
+    "utama": "#9a3412",
+    "aksen": "#fed7aa"
+  },
   "huruf": "jakarta",
-  "gaya": { "tema": "terang", "sudut": "bulat" },
+  "gaya": {
+    "tema": "terang",
+    "sudut": "bulat",
+    "tata": "kafe"
+  },
+  "hero": {
+    "bentuk": "melayang",
+    "gambar": "/produk/teh/thai-tea.svg"
+  },
   "teks": {
     "jenis": "Minuman",
     "slogan": "Thai tea dan teh susu, diseduh saat dipesan. Pesan dari HP, ambil tanpa antre.",

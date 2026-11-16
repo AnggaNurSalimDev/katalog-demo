@@ -3,11 +3,25 @@
   "nama": "Kilap Auto Detailing",
   "fiktif": true,
   "data": "detailing",
-  "logo": { "teks": "Kilap Auto", "gambar": "/merek/kilap-auto.svg" },
+  "logo": {
+    "teks": "Kilap Auto",
+    "gambar": "/merek/kilap-auto.svg"
+  },
   "favicon": "/merek/kilap-auto.svg",
-  "warna": { "utama": "#0f766e", "aksen": "#a7f3d0" },
+  "warna": {
+    "utama": "#0f766e",
+    "aksen": "#a7f3d0"
+  },
   "huruf": "grotesk",
-  "gaya": { "tema": "terang", "sudut": "sedang" },
+  "gaya": {
+    "tema": "terang",
+    "sudut": "sedang",
+    "tata": "garasi"
+  },
+  "hero": {
+    "bentuk": "putar",
+    "gambar": "/produk/detailing/mobil.svg"
+  },
   "teks": {
     "jenis": "Detailing mobil",
     "slogan": "Cuci, poles, dan coating. Bisa di workshop atau dikerjakan di rumahmu.",

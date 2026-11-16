@@ -93,3 +93,22 @@ describe('profil di src/merek/profil', () => {
     }
   });
 });
+
+describe('tata & hero', () => {
+  test('tata/hero tidak dikenal → bawaan; hero yang butuh gambar tanpa gambar → tiang', () => {
+    const a = validasiProfil({ id: 'kedai', gaya: { tata: 'galeri' }, hero: { bentuk: 'roket' } });
+    expect(a.profil.gaya.tata).toBe(PROFIL_BAWAAN.gaya.tata);
+    expect(a.profil.hero.bentuk).toBe(PROFIL_BAWAAN.hero.bentuk);
+    const b = validasiProfil({ id: 'kedai', hero: { bentuk: 'melayang', gambar: null } });
+    expect(b.profil.hero).toEqual({ bentuk: 'tiang', gambar: null });
+    expect(b.masalah.join()).toMatch(/hero.gambar/);
+  });
+  test('gambar hero di profil contoh ada filenya; tiap usaha punya tata sendiri', () => {
+    const tata = new Set();
+    for (const [, m] of semuaProfil()) {
+      if (m.hero.gambar) expect(existsSync(join(PUBLIK, m.hero.gambar)), m.hero.gambar).toBe(true);
+      tata.add(m.gaya.tata);
+    }
+    expect(tata.size).toBe(semuaProfil().length);
+  });
+});

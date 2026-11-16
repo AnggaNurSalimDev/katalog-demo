@@ -4,6 +4,7 @@ import { Lembar, terbang, useMiring, useToast } from '../komponen/umum.jsx';
 import { adaVariasiHarga, hitungTotal } from '../logika/harga.js';
 import { jumlahItem, tambahItem } from '../logika/keranjang.js';
 import { gambarProduk, pilihanAwal } from '../logika/stok.js';
+import Hero3D from '../komponen/Hero3D.jsx';
 import DetailProduk from './DetailProduk.jsx';
 import Keranjang from './Keranjang.jsx';
 
@@ -42,14 +43,18 @@ export default function Toko({ profil, toko, isi, form, ubahIsi, ubahForm }) {
   return (
     <>
       <section className="kepala-toko">
-        <p className="jenis">{profil.teks.jenis}</p>
-        <h1>{profil.nama}</h1>
-        <p className="slogan">{profil.teks.slogan}</p>
-        <div className="meta">
-          {toko.buka != null && <span>Buka {jam(toko.buka)}–{jam(toko.tutup)}</span>}
-          {profil.teks.alamat && <span>{profil.teks.alamat}</span>}
-          <span>{jasa ? 'Booking via WhatsApp' : 'Pesan via WhatsApp'}</span>
+        <span className="kata-latar" aria-hidden="true">{profil.logo.teks}</span>
+        <div className="teks-kepala">
+          <p className="jenis">{profil.teks.jenis}</p>
+          <h1>{profil.nama}</h1>
+          <p className="slogan">{profil.teks.slogan}</p>
+          <div className="meta">
+            {toko.buka != null && <span>Buka {jam(toko.buka)}–{jam(toko.tutup)}</span>}
+            {profil.teks.alamat && <span>{profil.teks.alamat}</span>}
+            <span>{jasa ? 'Booking via WhatsApp' : 'Pesan via WhatsApp'}</span>
+          </div>
         </div>
+        <Hero3D hero={profil.hero} />
       </section>
 
       <h2 className="judul-bagian">{jasa ? 'Layanan' : 'Produk'}</h2>
@@ -59,8 +64,10 @@ export default function Toko({ profil, toko, isi, form, ubahIsi, ubahForm }) {
             <div className="wadah-gambar">
               <img src={aset(gambarProduk(p, pilihanAwal(p)))} alt="" loading="lazy" draggable={false} />
             </div>
-            <b>{p.nama}</b>
-            <span className="sub">{p.desk}</span>
+            <span className="info">
+              <b>{p.nama}</b>
+              <span className="sub">{p.desk}</span>
+            </span>
             <span className="harga">{adaVariasiHarga(p) && <small>mulai </small>}{rupiah(p.harga)}</span>
           </button>
         ))}

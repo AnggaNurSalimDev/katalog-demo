@@ -3,11 +3,25 @@
   "nama": "Garis Barbershop",
   "fiktif": true,
   "data": "barber",
-  "logo": { "teks": "Garis Barbershop", "gambar": "/merek/garis-barbershop.svg" },
+  "logo": {
+    "teks": "Garis Barbershop",
+    "gambar": "/merek/garis-barbershop.svg"
+  },
   "favicon": "/merek/garis-barbershop.svg",
-  "warna": { "utama": "#d4a24c", "aksen": "#7f1d1d" },
+  "warna": {
+    "utama": "#d4a24c",
+    "aksen": "#7f1d1d"
+  },
   "huruf": "grotesk",
-  "gaya": { "tema": "gelap", "sudut": "sedang" },
+  "gaya": {
+    "tema": "gelap",
+    "sudut": "sedang",
+    "tata": "daftar"
+  },
+  "hero": {
+    "bentuk": "tiang",
+    "gambar": null
+  },
   "teks": {
     "jenis": "Barbershop",
     "slogan": "Potong rapi tanpa antre. Booking jam dulu, datang tinggal duduk.",

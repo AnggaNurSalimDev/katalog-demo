@@ -28,7 +28,7 @@ dan lebih sering memesan.
 
 Satu link, empat toko contoh:
 
-Setiap usaha punya **profil** sendiri (logo, warna, huruf, tema, sudut, slogan) dan **katalog** sendiri
+Setiap usaha punya **profil** sendiri (logo, warna, huruf, tema, sudut, slogan, **tata letak** dan **benda 3D** di kepala toko) dan **katalog** sendiri
 (produk dengan gambar masing-masing). Dipilih lewat `?profil=<id>` atau pengalih "Usaha contoh"; tidak ada
 halaman beranda umum, karena klien harus melihat demo sebagai toko sungguhan.
 
@@ -53,6 +53,15 @@ profil (src/merek/profil/<id>.json)          katalog (src/data/katalog/<data>.js
 ```
 
 id toko = id profil: keranjang dan formulir disimpan per usaha.
+
+Tata letak (`gaya.tata`) dan benda 3D (`hero.bentuk`) dipilih dari daftar tetap; markup sama, hanya CSS yang berubah:
+
+| tata | susunan | hero.bentuk | benda 3D |
+|---|---|---|---|
+| kafe | kartu dengan piring bulat, harga stiker | melayang | gambar di atas tatakan berputar |
+| lookbook | gambar tinggi, produk pertama besar | gantung | gambar berayun di hanger |
+| daftar | daftar harga seperti papan dinding | tiang | tiang barbershop (tanpa gambar) |
+| garasi | kartu mendatar, kilap logam | putar | gambar di meja putar + pantulan |
 
 ```js
 katalog = {
