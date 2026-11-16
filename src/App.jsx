@@ -32,7 +32,11 @@ export default function App() {
   const ganti = useCallback((id) => {
     if (!DAFTAR.has(id)) return;
     ingatPilihan(id);
-    window.history.pushState(null, '', `?profil=${encodeURIComponent(id)}`);
+    try {
+      window.history.pushState(null, '', `?profil=${encodeURIComponent(id)}`);
+    } catch {
+      /* bingkai tertentu (pratinjau) menolak ubah alamat: usaha tetap berganti */
+    }
     setProfil(DAFTAR.get(id));
     window.scrollTo(0, 0);
   }, []);
