@@ -1,0 +1,16 @@
+{
+  "id": "kilap-auto",
+  "nama": "Kilap Auto Detailing",
+  "fiktif": true,
+  "data": "detailing",
+  "logo": { "teks": "Kilap Auto", "gambar": "/merek/kilap-auto.svg" },
+  "favicon": "/merek/kilap-auto.svg",
+  "warna": { "utama": "#0f766e", "aksen": "#a7f3d0" },
+  "huruf": "grotesk",
+  "gaya": { "tema": "terang", "sudut": "sedang" },
+  "teks": {
+    "jenis": "Detailing mobil",
+    "slogan": "Cuci, poles, dan coating. Bisa di workshop atau dikerjakan di rumahmu.",
+    "alamat": "Jl. Soekarno-Hatta 410, Bandung"
+  }
+}

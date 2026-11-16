@@ -1,0 +1,16 @@
+{
+  "id": "rupa-wear",
+  "nama": "Rupa Wear",
+  "fiktif": true,
+  "data": "fashion",
+  "logo": { "teks": "RUPA WEAR", "gambar": "/merek/rupa-wear.svg" },
+  "favicon": "/merek/rupa-wear.svg",
+  "warna": { "utama": "#1c1917", "aksen": "#e7e5e4" },
+  "huruf": "fraunces",
+  "gaya": { "tema": "terang", "sudut": "tajam" },
+  "teks": {
+    "jenis": "Fashion",
+    "slogan": "Pakaian basic harian, bahan adem, potongan rapi. Pilih warna dan ukuran, kami siapkan.",
+    "alamat": "Jl. Trunojoyo 8, Bandung"
+  }
+}

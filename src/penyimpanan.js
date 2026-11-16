@@ -1,10 +1,12 @@
-// Keranjang & formulir disimpan di browser pengunjung, supaya tidak hilang saat halaman dimuat ulang.
+// Keranjang & formulir disimpan di browser pengunjung, per usaha, supaya tidak hilang saat dimuat ulang.
 // localStorage bisa melempar (mode privat, kuota penuh): demo tetap jalan, hanya tidak tersimpan.
 
-import { DAFTAR_TOKO } from './data/toko.js';
+import { buatToko } from './data/toko.js';
+import { DAFTAR_URUT } from './merek/daftar.jsx';
 import { bersihkanData } from './logika/formulir.js';
 
-const KUNCI = 'katalog-demo-v1';
+const KUNCI = 'katalog-demo-v2';
+export const SEMUA_TOKO = DAFTAR_URUT.map(buatToko);
 
 export function muatData() {
   let mentah = null;
@@ -13,7 +15,7 @@ export function muatData() {
   } catch {
     mentah = null;
   }
-  return bersihkanData(mentah, DAFTAR_TOKO);
+  return bersihkanData(mentah, SEMUA_TOKO);
 }
 
 export function simpanData(data) {

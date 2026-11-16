@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { NOMOR_WA } from '../konfigurasi.js';
-import { rupiah } from '../format.js';
-import Ikon, { svgProduk } from '../komponen/Ikon.jsx';
+import { aset, rupiah } from '../format.js';
 import { Langkah, useToast } from '../komponen/umum.jsx';
 import { perluAlamat } from '../logika/formulir.js';
 import { hargaSatuan, hitungTotal } from '../logika/harga.js';
 import { hapusItem, kembalikanItem, ubahJumlah } from '../logika/keranjang.js';
 import { buatPesan, linkWa, validasiPesanan } from '../logika/pesan.js';
-import { cariProduk, teksOpsi } from '../logika/stok.js';
+import { cariProduk, gambarProduk, teksOpsi } from '../logika/stok.js';
 import { JEDA_AMBIL, JEDA_BOOKING, formatJam, slotJam, tanggalLokal } from '../logika/waktu.js';
 
 /** Jam sekarang, diperbarui tiap 30 detik supaya slot yang lewat ikut tertutup. */
@@ -100,7 +99,7 @@ export default function Keranjang({ toko, isi, form, ubahIsi, ubahForm, onTutup 
         const p = cariProduk(toko, it.produkId);
         return (
           <div className="baris-item" key={`${it.produkId}-${i}`}>
-            <Ikon className="mini" svg={svgProduk(toko, p, it.pilihan)} />
+            <img className="mini" src={aset(gambarProduk(p, it.pilihan))} alt="" />
             <div>
               <div className="nm">{p.nama}</div>
               <div className="op">{teksOpsi(p, it.pilihan)}</div>

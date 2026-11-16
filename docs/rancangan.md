@@ -28,7 +28,11 @@ dan lebih sering memesan.
 
 Satu link, empat toko contoh:
 
-| Toko | Tipe | Yang diuji |
+Setiap usaha punya **profil** sendiri (logo, warna, huruf, tema, sudut, slogan) dan **katalog** sendiri
+(produk dengan gambar masing-masing). Dipilih lewat `?profil=<id>` atau pengalih "Usaha contoh"; tidak ada
+halaman beranda umum, karena klien harus melihat demo sebagai toko sungguhan.
+
+| Usaha | Tipe | Yang diuji |
 |---|---|---|
 | F&B (Kedai Teh Rasa) | barang | varian + opsi, harga berubah sesuai pilihan, waktu ambil |
 | Fashion (Rupa Wear) | barang | warna & ukuran, stok habis per kombinasi, warna ikon ikut pilihan |
@@ -41,18 +45,28 @@ Mesin katalog tidak tahu toko apa yang tampil. Untuk klien sungguhan cukup menul
 
 ### 4.1 Bentuk data
 
+```
+profil (src/merek/profil/<id>.json)          katalog (src/data/katalog/<data>.js)
+{ id, nama, data: 'teh', logo, favicon,  ─┐   { id: 'teh', tipe, produk, ... }
+  warna: { utama, aksen }, huruf,         │          │
+  gaya: { tema, sudut }, teks }           └──────────┴─▶ toko = { ...katalog, id: profil.id, nama: profil.nama }
+```
+
+id toko = id profil: keranjang dan formulir disimpan per usaha.
+
 ```js
-toko = {
-  id, nama, jenis, tipe: 'barang' | 'jasa', warna, tagline,
+katalog = {
+  id, tipe: 'barang' | 'jasa',
   // barang
   metode: ['Ambil di outlet', 'Diantar'], metodeAntar: 'Diantar', waktuAmbil: true,
   // jasa
   lokasi: ['Di barbershop', 'Home service'], lokasiRumah: 'Home service', biayaLokasi: { 'Home service': 30000 },
   buka: 10, tutup: 21,          // jam, untuk slot booking/ambil
-  swatch: { Hitam: '#1f2937' }, // opsional: warna ikon ikut pilihan Warna/Motif
+  swatch: { Hitam: '#1f2937' }, // opsional: titik warna di tombol pilihan Warna/Motif
   produk: [{
     id, nama, desk, harga,                   // harga dasar, rupiah bulat
-    ikon: { bentuk, warna, aksen },
+    gambar: '/produk/teh/thai-tea.svg',      // wajib, file harus ada di public/
+    gambarPer: { 'Warna:Putih': '/produk/fashion/kaos-putih.svg' },  // opsional
     opsi: [{ label: 'Ukuran', nilai: ['M', 'L'] }],
     tambah: { 'Ukuran:L': 4000 },            // DIJUMLAHKAN ke harga dasar
     habis: [['Warna:Putih', 'Ukuran:S']],    // kombinasi yang tidak tersedia
@@ -97,7 +111,8 @@ Kesalahan pengguna dikembalikan sebagai daftar pesan; pelanggaran invarian (bug/
 - Nomor WA toko harus format `62` + 8–13 digit sebelum link dibuat.
 - Harga & total: bilangan bulat ≥ 0.
 - Data dari localStorage tidak dipercaya: item yang tidak cocok dengan katalog dibuang.
-- Warna ikon divalidasi sebelum disisipkan ke SVG.
+- Profil divalidasi: field salah diganti bawaan dan dicatat; logo/favicon hanya path lokal; tulisan di atas warna utama ≥ 4.5:1.
+- Setiap path gambar produk dicek ada filenya (tes).
 
 ## 6. Batasan demo
 
@@ -105,7 +120,7 @@ Kesalahan pengguna dikembalikan sebagai daftar pesan; pelanggaran invarian (bug/
   Slot otomatis = paket upgrade.
 - Stok habis statis (diatur di data).
 - Ongkir tidak dihitung; pesan meminta penjual menginfokan.
-- Ikon digambar SVG; untuk klien sungguhan diganti foto produk.
+- Gambar produk di demo adalah ilustrasi SVG; untuk klien sungguhan diganti foto produk.
 
 ## 7. Di luar ruang lingkup
 

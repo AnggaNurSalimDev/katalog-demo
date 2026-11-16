@@ -9,7 +9,9 @@ Sumber kebenaran: **`docs/rancangan.md`**. Baca seluruhnya sebelum menulis kode.
 
 - Ikuti rancangan. Jika ada yang ambigu atau bertentangan, **tanyakan dulu**, jangan menebak diam-diam.
 - Jangan menambah fitur di luar rancangan (bagian 7 "Di luar ruang lingkup").
-- Satu mesin, data berbeda: halaman tidak boleh punya `if (toko.id === 'fnb')`. Perbedaan antar toko hanya lewat data di `src/data/toko.js`.
+- Satu mesin, data berbeda: halaman tidak boleh punya `if (toko.id === 'kedai-teh-rasa')`. Perbedaan antar usaha hanya lewat profil (`src/merek/profil/*.json`, tampilan) dan katalog (`src/data/katalog/*.js`, isi).
+- Warna, huruf, dan sudut di CSS selalu lewat variabel profil (`--utama`, `--di-atas-utama`, `--tautan`, `--radius`, …), bukan warna tetap.
+- Path aset di data ditulis dari akar public (`/produk/…`) dan ditampilkan lewat `aset()` supaya tetap benar bila base URL berubah.
 - Logika di `src/logika/` sebagai fungsi murni: tanpa localStorage, DOM, atau `Date.now()` langsung (waktu dikirim sebagai argumen `sekarang`).
 - Selalu sertakan guard clause dan invariant check.
 - Uang: bilangan bulat rupiah. Harga opsi dijumlahkan (`tambah`), tidak mengganti harga dasar.

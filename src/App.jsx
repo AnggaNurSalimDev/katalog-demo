@@ -1,41 +1,44 @@
 // Alur data:
 //
-//   localStorage ──muatData()──→ data { keranjang: {fnb: [...], ...}, formulir: {fnb: {...}, ...} }
+//   ?profil=kedai-teh-rasa ──profilDariAlamat──▶ profil (tampilan) ──terapkanProfil──▶ <html style="--utama…">
+//                                                   │
+//                                         buatToko(profil) ──▶ toko { ...KATALOG[profil.data], id, nama }
+//
+//   localStorage ──muatData()──▶ data { keranjang: { [toko.id]: [...] }, formulir: { [toko.id]: {...} } }
 //        ▲                              │
-//        └──────simpanData()────────────┤ (setiap berubah)
-//                                       ▼
-//   #fnb (alamat) ──→ cariToko ──→ <Toko toko isi form ubahIsi ubahForm>
+//        └──────simpanData()────────────┘ (setiap berubah)
 
-import { useCallback, useEffect, useState } from 'react';
-import { cariToko } from './data/toko.js';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { buatToko } from './data/toko.js';
+import { DAFTAR, PengalihProfil, ingatPilihan, profilDariAlamat, terapkanProfil } from './merek/daftar.jsx';
 import { muatData, simpanData } from './penyimpanan.js';
 import { PenyediaToast } from './komponen/umum.jsx';
-import Beranda from './halaman/Beranda.jsx';
 import Toko from './halaman/Toko.jsx';
-
-function useHash() {
-  const baca = () => decodeURIComponent(window.location.hash.slice(1));
-  const [hash, setHash] = useState(baca);
-  useEffect(() => {
-    const ubah = () => setHash(baca());
-    window.addEventListener('hashchange', ubah);
-    return () => window.removeEventListener('hashchange', ubah);
-  }, []);
-  return hash;
-}
+import { aset } from './format.js';
 
 export default function App() {
-  const toko = cariToko(useHash());
+  const [profil, setProfil] = useState(profilDariAlamat);
+  const toko = useMemo(() => buatToko(profil), [profil]);
   const [data, setData] = useState(muatData);
 
   useEffect(() => simpanData(data), [data]);
+  useEffect(() => terapkanProfil(profil), [profil]);
   useEffect(() => {
-    document.documentElement.style.setProperty('--aksen', toko ? toko.warna : '#334155');
+    const kembali = () => setProfil(profilDariAlamat());
+    window.addEventListener('popstate', kembali);
+    return () => window.removeEventListener('popstate', kembali);
+  }, []);
+
+  const ganti = useCallback((id) => {
+    if (!DAFTAR.has(id)) return;
+    ingatPilihan(id);
+    window.history.pushState(null, '', `?profil=${encodeURIComponent(id)}`);
+    setProfil(DAFTAR.get(id));
     window.scrollTo(0, 0);
-  }, [toko]);
+  }, []);
 
   const ubahIsi = useCallback(
-    (fn) => setData((d) => ({ ...d, keranjang: { ...d.keranjang, [toko.id]: fn(d.keranjang[toko.id]) } })),
+    (fn) => setData((d) => ({ ...d, keranjang: { ...d.keranjang, [toko.id]: fn(d.keranjang[toko.id] ?? []) } })),
     [toko],
   );
   const ubahForm = useCallback(
@@ -47,20 +50,14 @@ export default function App() {
     <PenyediaToast>
       <header className="bar-atas">
         <div>
-          {toko && (
-            <a className="ib" href="#" aria-label="Kembali ke daftar toko">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M15 5l-7 7 7 7" /></svg>
-            </a>
-          )}
-          <span className="merek">Katalog WA <small>· demo</small></span>
+          {profil.logo.gambar && <img className="logo" src={aset(profil.logo.gambar)} alt="" />}
+          <span className="merek">{profil.logo.teks}</span>
         </div>
       </header>
       <main className="isi">
-        {toko ? (
-          <Toko key={toko.id} toko={toko} isi={data.keranjang[toko.id]} form={data.formulir[toko.id]} ubahIsi={ubahIsi} ubahForm={ubahForm} />
-        ) : (
-          <Beranda />
-        )}
+        <Toko key={toko.id} profil={profil} toko={toko} isi={data.keranjang[toko.id] ?? []} form={data.formulir[toko.id]} ubahIsi={ubahIsi} ubahForm={ubahForm} />
+        <PengalihProfil profil={profil} onGanti={ganti} />
+        <p className="halus">{profil.fiktif ? 'Usaha, produk, dan harga di demo ini fiktif. Pesanan diteruskan ke nomor WA demo.' : ''}</p>
       </main>
     </PenyediaToast>
   );

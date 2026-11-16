@@ -70,4 +70,17 @@ export function pilihOpsi(produk, pilihan, label, nilai) {
   return { pilihan: terbaik, diubah: Object.keys(terbaik).filter((x) => terbaik[x] !== berikut[x]) };
 }
 
-export const teksOpsi = (produk, pilihan) => (produk.opsi ?? []).map((o) => `${o.label}: ${pilihan[o.label]}`).join(', ');
+/**
+ * Gambar yang tampil untuk pilihan ini: gambarPer['Warna:Putih'] bila ada, selain itu gambar utama.
+ *   { gambar: '/produk/fashion/kaos-hitam.svg', gambarPer: { 'Warna:Putih': '/…/kaos-putih.svg' } }
+ */
+export function gambarProduk(produk, pilihan) {
+  invarian(typeof produk?.gambar === 'string', `gambar ${produk?.id} wajib ada`);
+  for (const o of produk.opsi ?? []) {
+    const g = produk.gambarPer?.[kunci(o.label, pilihan?.[o.label])];
+    if (g) return g;
+  }
+  return produk.gambar;
+}
+
+export const teksOpsi =(produk, pilihan) => (produk.opsi ?? []).map((o) => `${o.label}: ${pilihan[o.label]}`).join(', ');

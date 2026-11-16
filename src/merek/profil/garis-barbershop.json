@@ -1,0 +1,16 @@
+{
+  "id": "garis-barbershop",
+  "nama": "Garis Barbershop",
+  "fiktif": true,
+  "data": "barber",
+  "logo": { "teks": "Garis Barbershop", "gambar": "/merek/garis-barbershop.svg" },
+  "favicon": "/merek/garis-barbershop.svg",
+  "warna": { "utama": "#d4a24c", "aksen": "#7f1d1d" },
+  "huruf": "grotesk",
+  "gaya": { "tema": "gelap", "sudut": "sedang" },
+  "teks": {
+    "jenis": "Barbershop",
+    "slogan": "Potong rapi tanpa antre. Booking jam dulu, datang tinggal duduk.",
+    "alamat": "Jl. Burangrang 21, Bandung"
+  }
+}

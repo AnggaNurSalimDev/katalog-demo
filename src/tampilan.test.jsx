@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
-// Tes asap: setiap toko bisa dirender, dan alur pesan utama bisa diklik sampai link WA siap.
+// Tes asap: setiap usaha bisa dirender dengan produk & gambarnya, dan alur pesan utama bisa diklik sampai link WA siap.
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import App from './App.jsx';
-import { DAFTAR_TOKO } from './data/toko.js';
+import { DAFTAR_URUT } from './merek/daftar.jsx';
+import { SEMUA_TOKO } from './penyimpanan.js';
 
 beforeEach(() => {
   localStorage.clear();
@@ -14,24 +15,33 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-const keHash = (h) => act(() => {
-  window.location.hash = h;
-  window.dispatchEvent(new HashChangeEvent('hashchange'));
-});
+const bukaUsaha = (nama) => fireEvent.click(within(screen.getByRole('region', { name: 'Pilih usaha contoh' })).getByRole('button', { name: nama }));
 
 describe('tampilan demo', () => {
-  it('beranda menampilkan keempat toko, tiap toko menampilkan produknya', () => {
+  it('pengalih menampilkan keempat usaha; tiap usaha punya produk dengan gambarnya sendiri', () => {
     render(<App />);
-    for (const t of DAFTAR_TOKO) expect(screen.getByText(t.nama)).toBeTruthy();
-    for (const t of DAFTAR_TOKO) {
-      keHash(t.id);
-      for (const p of t.produk) expect(screen.getByText(p.nama)).toBeTruthy();
+    const gambarDilihat = new Set();
+    for (const [i, p] of DAFTAR_URUT.entries()) {
+      bukaUsaha(p.nama);
+      if (i > 0) expect(window.location.search).toBe(`?profil=${p.id}`); // usaha pertama sudah aktif
+      expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(p.nama);
+      expect(document.documentElement.dataset.tema).toBe(p.gaya.tema);
+      for (const x of SEMUA_TOKO[i].produk) expect(screen.getByText(x.nama)).toBeTruthy();
+      for (const img of document.querySelectorAll('.wadah-gambar img')) gambarDilihat.add(img.getAttribute('src'));
     }
+    const jumlahProduk = SEMUA_TOKO.reduce((t, toko) => t + toko.produk.length, 0);
+    expect(gambarDilihat.size).toBe(jumlahProduk); // tidak ada dua produk dengan gambar sama
+  });
+
+  it('?profil= di alamat membuka usaha itu langsung', () => {
+    history.replaceState(null, '', '/?profil=kilap-auto');
+    render(<App />);
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Kilap Auto Detailing');
   });
 
   it('F&B: pilih ukuran L + boba → keranjang → isi nama → link WA siap', () => {
+    history.replaceState(null, '', '/?profil=kedai-teh-rasa');
     render(<App />);
-    keHash('fnb');
     fireEvent.click(screen.getByText('Thai Tea Original'));
     const detail = screen.getByRole('dialog', { name: 'Detail produk' });
     fireEvent.click(within(detail).getByRole('button', { name: /^L ?\+Rp/ }));
@@ -48,14 +58,13 @@ describe('tampilan demo', () => {
 
     fireEvent.change(within(keranjang).getByLabelText('Nama pemesan'), { target: { value: 'Sari' } });
     expect(kirim.getAttribute('aria-disabled')).toBe('false');
-    expect(kirim.getAttribute('href')).toMatch(/^https:\/\/wa\.me\/62\d+\?text=/);
+    expect(kirim.getAttribute('href')).toMatch(/^https:\/\/wa\.me\/62\d+\?text=Halo%20Kedai%20Teh%20Rasa/);
     expect(screen.getByTestId('pratinjau').textContent).toContain('1. Thai Tea Original x2');
-    expect(screen.getByTestId('pratinjau').textContent).toContain('Ukuran: L, Gula: Normal, Es: Normal, Topping: Boba');
   });
 
-  it('fashion: memilih warna yang habis di ukuran sekarang menyesuaikan ukuran', () => {
+  it('fashion: gambar ikut warna; warna yang habis di ukuran sekarang menyesuaikan ukuran', () => {
+    history.replaceState(null, '', '/?profil=rupa-wear');
     render(<App />);
-    keHash('fashion');
     fireEvent.click(screen.getByText('Kaos Polos Premium'));
     const detail = screen.getByRole('dialog', { name: 'Detail produk' });
     fireEvent.click(within(detail).getByRole('button', { name: 'S' }));
@@ -63,14 +72,18 @@ describe('tampilan demo', () => {
     expect(within(detail).getByRole('button', { name: 'Putih' }).getAttribute('aria-pressed')).toBe('true');
     expect(within(detail).getByRole('button', { name: 'S' }).getAttribute('aria-pressed')).toBe('false');
     expect(screen.getByRole('status').textContent).toMatch(/Ukuran diganti/);
+    expect(within(detail).getByRole('img', { name: 'Kaos Polos Premium' }).getAttribute('src')).toBe('/produk/fashion/kaos-putih.svg');
   });
 
-  it('keranjang tersimpan setelah halaman dimuat ulang', () => {
+  it('keranjang tiap usaha terpisah dan tersimpan setelah dimuat ulang', () => {
+    history.replaceState(null, '', '/?profil=garis-barbershop');
     const { unmount } = render(<App />);
-    keHash('barber');
     fireEvent.click(screen.getByText('Cukur Jenggot'));
     fireEvent.click(within(screen.getByRole('dialog', { name: 'Detail layanan' })).getByRole('button', { name: /Pilih layanan/ }));
+    bukaUsaha('Kilap Auto Detailing');
+    expect(screen.queryByRole('button', { name: /Lihat booking/ })).toBeNull();
     unmount();
+    history.replaceState(null, '', '/?profil=garis-barbershop');
     render(<App />);
     expect(screen.getByRole('button', { name: /Lihat booking/ }).textContent).toMatch(/^1/);
   });

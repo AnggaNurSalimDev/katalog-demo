@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { DAFTAR_TOKO, cariToko } from '../data/toko.js';
-import { bisaTersedia, cariProduk, isHabis, pilihOpsi, pilihanAwal, semuaKombinasi } from './stok.js';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { KATALOG } from '../data/katalog/index.js';
+import { buatToko } from '../data/toko.js';
+import pTeh from '../merek/profil/kedai-teh-rasa.json';
+import pFashion from '../merek/profil/rupa-wear.json';
+import pBarber from '../merek/profil/garis-barbershop.json';
+import pDetailing from '../merek/profil/kilap-auto.json';
+import { bisaTersedia, cariProduk, gambarProduk, isHabis, pilihOpsi, pilihanAwal, semuaKombinasi } from './stok.js';
 import { hargaSatuan, hitungTotal } from './harga.js';
 import { BATAS_JUMLAH, hapusItem, kembalikanItem, tambahItem, ubahJumlah } from './keranjang.js';
 import { buatPesan, linkWa, validasiPesanan } from './pesan.js';
@@ -9,27 +16,38 @@ import { formatTanggal, keMenit, slotJam, tanggalLokal } from './waktu.js';
 
 const NOMOR = '6281234567890';
 const SENIN_SIANG = new Date(2026, 10, 16, 13, 0); // 16 Nov 2026 13.00 waktu lokal
-const fnb = cariToko('fnb');
-const fashion = cariToko('fashion');
-const barber = cariToko('barber');
-const detailing = cariToko('detailing');
+const fnb = buatToko(pTeh);
+const fashion = buatToko(pFashion);
+const barber = buatToko(pBarber);
+const detailing = buatToko(pDetailing);
+const DAFTAR_TOKO = [fnb, fashion, barber, detailing];
+const PUBLIK = join(import.meta.dirname, '..', '..', 'public');
 const p = (toko, id) => cariProduk(toko, id);
 
 describe('data katalog (invarian)', () => {
   it('id toko dan produk unik, harga bulat ≥ 0', () => {
     expect(new Set(DAFTAR_TOKO.map((t) => t.id)).size).toBe(DAFTAR_TOKO.length);
-    for (const t of DAFTAR_TOKO) {
+    for (const t of Object.values(KATALOG)) {
       expect(new Set(t.produk.map((x) => x.id)).size).toBe(t.produk.length);
       for (const x of t.produk) expect(Number.isInteger(x.harga) && x.harga >= 0).toBe(true);
     }
   });
-  it('setiap kunci tambah/habis merujuk opsi & nilai yang ada', () => {
-    for (const t of DAFTAR_TOKO)
+  it('setiap kunci tambah/habis/gambarPer merujuk opsi & nilai yang ada', () => {
+    for (const t of Object.values(KATALOG))
       for (const x of t.produk) {
         const sah = new Set((x.opsi ?? []).flatMap((o) => o.nilai.map((v) => `${o.label}:${v}`)));
         for (const k of Object.keys(x.tambah ?? {})) expect(sah.has(k), `${x.id} tambah ${k}`).toBe(true);
         for (const kombo of x.habis ?? []) for (const k of kombo) expect(sah.has(k), `${x.id} habis ${k}`).toBe(true);
+        for (const k of Object.keys(x.gambarPer ?? {})) expect(sah.has(k), `${x.id} gambarPer ${k}`).toBe(true);
       }
+  });
+  it('setiap gambar produk ada filenya di public/', () => {
+    for (const t of Object.values(KATALOG))
+      for (const x of t.produk)
+        for (const g of [x.gambar, ...Object.values(x.gambarPer ?? {})]) {
+          expect(g, x.id).toMatch(/^\/produk\/[\w-]+\/[\w-]+\.(svg|png|jpe?g|webp)$/);
+          expect(existsSync(join(PUBLIK, g)), g).toBe(true);
+        }
   });
   it('setiap produk punya minimal satu kombinasi tersedia', () => {
     for (const t of DAFTAR_TOKO) for (const x of t.produk) expect(isHabis(x, pilihanAwal(x)), x.id).toBe(false);
@@ -59,6 +77,12 @@ describe('stok & opsi', () => {
     expect(r.pilihan.Warna).toBe('Putih');
     expect(r.pilihan.Ukuran).not.toBe('S');
     expect(r.diubah).toEqual(['Ukuran']);
+  });
+  it('gambar ikut pilihan warna, selain itu gambar utama', () => {
+    const kaos = p(fashion, 'ks');
+    expect(gambarProduk(kaos, { Warna: 'Putih', Ukuran: 'M' })).toBe('/produk/fashion/kaos-putih.svg');
+    expect(gambarProduk(p(fnb, 'tt'), pilihanAwal(p(fnb, 'tt')))).toBe('/produk/teh/thai-tea.svg');
+    expect(() => gambarProduk({ id: 'x' }, {})).toThrow(/Invarian/);
   });
   it('nilai yang tidak pernah tersedia / tidak dikenal → null', () => {
     const gt = p(fnb, 'gt');
@@ -195,15 +219,15 @@ describe('data tersimpan dibersihkan', () => {
   it('item rusak dibuang, kolom aneh kembali ke awal', () => {
     const mentah = {
       keranjang: {
-        fnb: [{ produkId: 'tt', pilihan: { Ukuran: 'M', Gula: 'Normal', Es: 'Normal', Topping: 'Tanpa' }, jumlah: 2 }, { produkId: 'hilang', pilihan: {}, jumlah: 1 }, { produkId: 'lt', pilihan: { Ukuran: 'XXL', Es: 'Normal' }, jumlah: 1 }, { produkId: 'lt', pilihan: { Ukuran: 'M', Es: 'Normal' }, jumlah: 500 }],
-        barber: 'bukan array',
+        'kedai-teh-rasa': [{ produkId: 'tt', pilihan: { Ukuran: 'M', Gula: 'Normal', Es: 'Normal', Topping: 'Tanpa' }, jumlah: 2 }, { produkId: 'hilang', pilihan: {}, jumlah: 1 }, { produkId: 'lt', pilihan: { Ukuran: 'XXL', Es: 'Normal' }, jumlah: 1 }, { produkId: 'lt', pilihan: { Ukuran: 'M', Es: 'Normal' }, jumlah: 500 }],
+        'garis-barbershop': 'bukan array',
       },
-      formulir: { fnb: { nama: 'Sari', metode: 'Teleportasi', jam: 7 } },
+      formulir: { 'kedai-teh-rasa': { nama: 'Sari', metode: 'Teleportasi', jam: 7 } },
     };
     const d = bersihkanData(mentah, DAFTAR_TOKO);
-    expect(d.keranjang.fnb).toHaveLength(1);
-    expect(d.keranjang.barber).toEqual([]);
-    expect(d.formulir.fnb).toEqual({ ...formAwal(fnb), nama: 'Sari' });
-    expect(bersihkanData(null, DAFTAR_TOKO).formulir.detailing).toEqual(formAwal(detailing));
+    expect(d.keranjang['kedai-teh-rasa']).toHaveLength(1);
+    expect(d.keranjang['garis-barbershop']).toEqual([]);
+    expect(d.formulir['kedai-teh-rasa']).toEqual({ ...formAwal(fnb), nama: 'Sari' });
+    expect(bersihkanData(null, DAFTAR_TOKO).formulir['kilap-auto']).toEqual(formAwal(detailing));
   });
 });

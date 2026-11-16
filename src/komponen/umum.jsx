@@ -97,14 +97,17 @@ export function Lembar({ terbuka, judul, onTutup, children }) {
 }
 
 /* ---------- Animasi ikon terbang ke tombol keranjang ---------- */
-export function terbang(dari, svg, ke) {
+export function terbang(dari, gambar, ke) {
   if (!dari || !ke || kurangiGerak()) return Promise.resolve();
   const b = ke.getBoundingClientRect();
   const x0 = dari.left + dari.width / 2;
   const y0 = dari.top + dari.height / 2;
   const el = document.createElement('div');
   el.className = 'terbang';
-  el.innerHTML = svg;
+  const img = document.createElement('img');
+  img.src = gambar;
+  img.alt = '';
+  el.appendChild(img);
   el.style.left = `${x0 - 28}px`;
   el.style.top = `${y0 - 28}px`;
   document.body.appendChild(el);

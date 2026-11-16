@@ -1,14 +1,15 @@
 import { useRef, useState } from 'react';
-import { rupiah } from '../format.js';
-import Ikon, { svgProduk } from '../komponen/Ikon.jsx';
+import { aset, rupiah } from '../format.js';
 import { Lembar, terbang, useMiring, useToast } from '../komponen/umum.jsx';
 import { adaVariasiHarga, hitungTotal } from '../logika/harga.js';
 import { jumlahItem, tambahItem } from '../logika/keranjang.js';
-import { pilihanAwal } from '../logika/stok.js';
+import { gambarProduk, pilihanAwal } from '../logika/stok.js';
 import DetailProduk from './DetailProduk.jsx';
 import Keranjang from './Keranjang.jsx';
 
-export default function Toko({ toko, isi, form, ubahIsi, ubahForm }) {
+const jam = (j) => `${String(j).padStart(2, '0')}.00`;
+
+export default function Toko({ profil, toko, isi, form, ubahIsi, ubahForm }) {
   // Lembar detail: produk disimpan terpisah dari "terbuka" supaya isinya tetap ada saat animasi menutup.
   const [detail, setDetail] = useState({ produk: null, terbuka: false, ke: 0 });
   const [keranjangTerbuka, setKeranjangTerbuka] = useState(false);
@@ -19,16 +20,16 @@ export default function Toko({ toko, isi, form, ubahIsi, ubahForm }) {
   const jasa = toko.tipe === 'jasa';
   const n = jumlahItem(isi);
 
-  function tambah(pilihan, jumlah, dari, svg) {
+  function tambah(pilihan, jumlah, dari, gambar) {
     const r = tambahItem(toko, isi, detail.produk, pilihan, jumlah);
     setDetail((d) => ({ ...d, terbuka: false }));
     if (r.hasil === 'SUDAH_ADA') return toast('Layanan ini sudah ada di booking.');
     if (r.hasil === 'HABIS' || r.hasil === 'TIDAK_SAH') return toast('Pilihan ini tidak bisa dipesan.');
     ubahIsi(() => r.isi);
     toast(jasa ? 'Layanan ditambahkan ke booking.' : 'Ditambahkan ke keranjang.');
-    // Tunggu tombol keranjang muncul (bila sebelumnya kosong), lalu terbangkan ikon ke sana.
+    // Tunggu tombol keranjang muncul (bila sebelumnya kosong), lalu terbangkan gambar ke sana.
     requestAnimationFrame(() =>
-      terbang(dari, svg, hitunganRef.current).then(() => {
+      terbang(dari, aset(gambar), hitunganRef.current).then(() => {
         const b = tombolRef.current;
         if (!b) return;
         b.classList.remove('loncat');
@@ -41,26 +42,29 @@ export default function Toko({ toko, isi, form, ubahIsi, ubahForm }) {
   return (
     <>
       <section className="kepala-toko">
-        <p className="jenis">{toko.jenis}</p>
-        <h1>{toko.nama}</h1>
-        <p>{toko.tagline}</p>
-        <span className="meta">
-          {toko.buka != null && `Buka ${String(toko.buka).padStart(2, '0')}.00–${toko.tutup}.00 · `}
-          {jasa ? 'Booking via WhatsApp' : 'Pesan via WhatsApp'}
-        </span>
+        <p className="jenis">{profil.teks.jenis}</p>
+        <h1>{profil.nama}</h1>
+        <p className="slogan">{profil.teks.slogan}</p>
+        <div className="meta">
+          {toko.buka != null && <span>Buka {jam(toko.buka)}–{jam(toko.tutup)}</span>}
+          {profil.teks.alamat && <span>{profil.teks.alamat}</span>}
+          <span>{jasa ? 'Booking via WhatsApp' : 'Pesan via WhatsApp'}</span>
+        </div>
       </section>
 
+      <h2 className="judul-bagian">{jasa ? 'Layanan' : 'Produk'}</h2>
       <div className="kisi">
         {toko.produk.map((p) => (
           <button key={p.id} type="button" className="kartu miring" {...miring} onClick={() => setDetail((d) => ({ produk: p, terbuka: true, ke: d.ke + 1 }))}>
-            <div className="wadah-ikon"><Ikon svg={svgProduk(toko, p, pilihanAwal(p))} /></div>
+            <div className="wadah-gambar">
+              <img src={aset(gambarProduk(p, pilihanAwal(p)))} alt="" loading="lazy" draggable={false} />
+            </div>
             <b>{p.nama}</b>
             <span className="sub">{p.desk}</span>
             <span className="harga">{adaVariasiHarga(p) && <small>mulai </small>}{rupiah(p.harga)}</span>
           </button>
         ))}
       </div>
-      <p className="halus">Toko dan harga fiktif. Pesanan diteruskan ke nomor WA demo.</p>
 
       <button ref={tombolRef} type="button" className="tombol-keranjang" hidden={n === 0} onClick={() => setKeranjangTerbuka(true)}>
         <span className="hitungan" ref={hitunganRef}>{n}</span>
